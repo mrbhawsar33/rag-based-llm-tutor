@@ -1,0 +1,5 @@
+# Environment files
+.env
+
+# Virtual environments
+.my_venv/
