@@ -70,11 +70,12 @@ pip install -r requirements.txt
 
 ### 6. Project structure
 
+```
 ├── /data/
 │   ├── /pdfs/             # Place your PDF files here
 │   └── /chroma_db/        # The vector database will be stored here
 ├── /app/
-│   ├── agent.py             # Place your PDF files here
+│   ├── agent.py           
 │   └── config.py
 │   └── main.py
 │   └── tutor.py
@@ -84,6 +85,7 @@ pip install -r requirements.txt
 ├── .env
 ├── requirements.txt
 ├── README.md
+```
 
 ### 7. Run the application
 
