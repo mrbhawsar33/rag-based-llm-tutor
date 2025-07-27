@@ -67,3 +67,26 @@ Install all the required Python libraries using the `requirements.txt` file:
 ```bash
 pip install -r requirements.txt
 ```
+
+### 6. Project structure
+
+├── /data/
+│   ├── /pdfs/             # Place your PDF files here
+│   └── /chroma_db/        # The vector database will be stored here
+├── /app/
+│   ├── agent.py             # Place your PDF files here
+│   └── config.py
+│   └── main.py
+│   └── tutor.py
+│   └── ui.py
+│   └── utils.py
+├── /notebooks/            # Jupyter notebooks with initial exploratory modular experiments
+├── .env
+├── requirements.txt
+├── README.md
+
+### 7. Run the application
+
+```bash
+uvicorn app.main:app --reload --root-path / 
+```
