@@ -2,4 +2,7 @@
 .env
 
 # Virtual environments
-.my_venv/
+my_venv/
+
+# Python temporary files
+*/__pycache__/
