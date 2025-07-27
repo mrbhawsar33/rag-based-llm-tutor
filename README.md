@@ -75,7 +75,7 @@ pip install -r requirements.txt
 │   ├── /pdfs/             # Place your PDF files here
 │   └── /chroma_db/        # The vector database will be stored here
 ├── /app/
-│   ├── agent.py             # Place your PDF files here
+│   ├── agent.py           
 │   └── config.py
 │   └── main.py
 │   └── tutor.py
