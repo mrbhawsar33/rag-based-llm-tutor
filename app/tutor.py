@@ -1,6 +1,8 @@
+"""Contains the logic for the RAG-based AI tutor."""
+
+from typing import List
 import os
 import chromadb
-from typing import List, Dict, Any
 
 from llama_index.core import (
     SimpleDirectoryReader,
@@ -49,8 +51,8 @@ class Tutor:
             "Do not hallucinate or create information. "
             "When the answer is in the context, provide clear, step-by-step explanations and "
             "practical examples."
-        )#: 'I cannot answer this question based on the provided documents.' 
-        
+        )
+
         if not MISTRAL_API_KEY:
             raise ValueError("MISTRAL_API_KEY not found in environment variables.")
 
@@ -69,12 +71,12 @@ class Tutor:
             return []
 
         pdf_docs = SimpleDirectoryReader(PDF_DIR).load_data()
-        
+
         preprocessed_docs = [
             Document(text=preprocess_text(doc.text), metadata=doc.metadata)
             for doc in pdf_docs
         ]
-        
+
         print(f"Loaded and preprocessed {len(preprocessed_docs)} documents.")
         return preprocessed_docs
 
@@ -91,7 +93,7 @@ class Tutor:
             if not documents:
                 print("No documents found to build index.")
                 return None
-            
+
             vector_index = VectorStoreIndex.from_documents(
                 documents,
                 storage_context=storage_context,
@@ -104,7 +106,7 @@ class Tutor:
                 vector_store=vector_store,
                 storage_context=storage_context
             )
-        
+
         return vector_index.as_query_engine(
             similarity_top_k=SIMILARITY_TOP_K,
             response_mode="compact"
@@ -120,7 +122,7 @@ class Tutor:
         """Formats the conversation history into a string for the LLM."""
         if not self.conversation_history:
             return ""
-        
+
         context = "\nPrevious conversation context:\n"
         for i, entry in enumerate(self.conversation_history, 1):
             context += f"Q{i}: {entry['question']}\n"
@@ -149,5 +151,5 @@ class Tutor:
 
         if use_context:
             self.add_to_history(question, answer)
-        
+
         return answer

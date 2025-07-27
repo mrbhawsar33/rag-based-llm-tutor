@@ -1,6 +1,8 @@
+"""Main entry point for the FastAPI application and Gradio UI."""
+
+from contextlib import asynccontextmanager
 import gradio as gr
 from fastapi import FastAPI
-from contextlib import asynccontextmanager
 from app.ui import create_interface
 from app.tutor import Tutor
 
@@ -9,6 +11,11 @@ state = {}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Manages the application's startup and shutdown events.
+    On startup, it initializes the AI Tutor.
+    On shutdown, it clears the application state.
+    """
     # Runs on startup
     print("Application Startup: Initializing AI Tutor...")
     state["python_tutor"] = Tutor()
@@ -26,4 +33,5 @@ app = gr.mount_gradio_app(app, create_interface(state), path="/")
 
 @app.get("/health")
 def read_root():
+    """A health check endpoint to confirm the API is running."""
     return {"status": "ok"}

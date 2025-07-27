@@ -1,3 +1,5 @@
+"""Provides utility functions for the application, such as text preprocessing."""
+
 import re
 
 def preprocess_text(text: str) -> str:

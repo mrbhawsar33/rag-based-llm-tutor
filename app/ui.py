@@ -1,3 +1,5 @@
+"""Creates and configures the Gradio user interface for the application."""
+
 import gradio as gr
 from app.agent import get_python_version_info
 
@@ -5,9 +7,9 @@ def create_tutor_response(question, use_context, tutor_instance):
     """Handles the tutor interaction logic."""
     if not tutor_instance:
         return "Tutor is not initialized. Please wait for startup to complete.", ""
-        
+
     answer = tutor_instance.ask_question(question, use_context)
-    
+
     context_info = f"Context Enabled: {use_context}\n"
     context_info += f"History Length: {len(tutor_instance.conversation_history)} items"
     return answer, context_info
@@ -24,8 +26,8 @@ def create_interface(state: dict) -> gr.Blocks:
 
     def get_tutor():
         return state.get("python_tutor")
-    
-    with gr.Blocks(title="Python AI Assistant", theme=gr.themes.Soft()) as interface:
+
+    with gr.Blocks(title="Python AI Assistant", theme=gr.themes.Soft()) as user_interface:
         gr.Markdown("# 🐍 Python AI Assistant")
         gr.Markdown("Your all-in-one assistant for Python questions and release information.")
 
@@ -45,8 +47,8 @@ def create_interface(state: dict) -> gr.Blocks:
                             scale=1
                         )
                         with gr.Row():
-                           submit_btn = gr.Button("Ask Tutor", variant="primary")
-                           clear_btn = gr.Button("Clear History")
+                            submit_btn = gr.Button("Ask Tutor", variant="primary")
+                            clear_btn = gr.Button("Clear History")
 
                     with gr.Column(scale=1):
                         context_info = gr.Textbox(
@@ -67,7 +69,7 @@ def create_interface(state: dict) -> gr.Blocks:
                     max_lines=20,
                     interactive=False
                 )
-                
+
                 submit_btn.click(
                     fn=lambda q, u: create_tutor_response(q, u, get_tutor()),
                     inputs=[question_input, context_toggle],
@@ -84,7 +86,7 @@ def create_interface(state: dict) -> gr.Blocks:
                     "### Get Latest Python Releases\n"
                     "The agent will retrieve the most recent Python release versions available."
                 )
-                
+
                 # Define the prompt that will be displayed and used
                 agent_prompt_text = (
                     "Find and list the latest Python release versions. Present the "
@@ -102,7 +104,7 @@ def create_interface(state: dict) -> gr.Blocks:
 
                 # The button to trigger the agent
                 agent_button = gr.Button("Get Latest Releases", variant="primary")
-                
+
                 # Output for displaying the latest releases
                 agent_output = gr.Textbox(
                     label="Latest Python Releases",
@@ -128,11 +130,10 @@ def create_interface(state: dict) -> gr.Blocks:
                 )
 
     print("Gradio UI created.")
-    return interface
-
+    return user_interface
 
 if __name__ == "__main__":
     # A mock state object is created and passed for standalone testing.
-    mock_state = {"python_tutor": None} 
+    mock_state = {"python_tutor": None}
     interface = create_interface(mock_state)
     interface.launch()

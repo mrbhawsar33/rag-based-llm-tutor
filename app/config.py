@@ -1,3 +1,5 @@
+"""Handles configuration variables and API keys for the application."""
+
 import os
 from dotenv import load_dotenv
 
