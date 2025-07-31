@@ -15,6 +15,7 @@ EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 # --- File Paths ---
 PDF_DIR = "data/pdfs"
+URL_DIR = "data"
 DB_DIR = "data/chroma_db"
 
 # --- ChromaDB Settings ---

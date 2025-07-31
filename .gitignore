@@ -6,3 +6,6 @@ my_venv/
 
 # Python temporary files
 */__pycache__/
+
+# Vector embeddings
+data/chroma_db/

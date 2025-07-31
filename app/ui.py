@@ -7,9 +7,9 @@ def create_tutor_response(question, use_context, tutor_instance):
     """Handles the tutor interaction logic."""
     if not tutor_instance:
         return "Tutor is not initialized. Please wait for startup to complete.", ""
-
+        
     answer = tutor_instance.ask_question(question, use_context)
-
+    
     context_info = f"Context Enabled: {use_context}\n"
     context_info += f"History Length: {len(tutor_instance.conversation_history)} items"
     return answer, context_info
@@ -26,13 +26,13 @@ def create_interface(state: dict) -> gr.Blocks:
 
     def get_tutor():
         return state.get("python_tutor")
-
-    with gr.Blocks(title="Python AI Assistant", theme=gr.themes.Soft()) as user_interface:
+    
+    with gr.Blocks(title="Python AI Assistant", theme=gr.themes.Soft()) as interface:
         gr.Markdown("# 🐍 Python AI Assistant")
-        gr.Markdown("Your all-in-one assistant for Python questions and release information.")
+        # gr.Markdown("Your all-in-one assistant for Python questions and release information.")
 
         with gr.Tabs():
-            # --- Tutor Tab (No changes here) ---
+            # --- Tutor Tab ---
             with gr.TabItem("Python Tutor (RAG)"):
                 with gr.Row():
                     with gr.Column(scale=2):
@@ -47,8 +47,8 @@ def create_interface(state: dict) -> gr.Blocks:
                             scale=1
                         )
                         with gr.Row():
-                            submit_btn = gr.Button("Ask Tutor", variant="primary")
-                            clear_btn = gr.Button("Clear History")
+                           submit_btn = gr.Button("Ask Tutor", variant="primary")
+                           clear_btn = gr.Button("Clear History")
 
                     with gr.Column(scale=1):
                         context_info = gr.Textbox(
@@ -69,7 +69,7 @@ def create_interface(state: dict) -> gr.Blocks:
                     max_lines=20,
                     interactive=False
                 )
-
+                
                 submit_btn.click(
                     fn=lambda q, u: create_tutor_response(q, u, get_tutor()),
                     inputs=[question_input, context_toggle],
@@ -80,60 +80,58 @@ def create_interface(state: dict) -> gr.Blocks:
                     outputs=[answer_output, context_info]
                 )
 
-            # --- SIMPLIFIED Latest Releases Agent Tab ---
-            with gr.TabItem("Latest Python Releases"):
+            # --- MODIFIED Latest Release & Features Agent Tab ---
+            with gr.TabItem("Latest Release & Features"):
                 gr.Markdown(
-                    "### Get Latest Python Releases\n"
-                    "The agent will retrieve the most recent Python release versions available."
+                    "### Get Latest Python Release and Major Features\n"
+                    "The agent will find the latest Python release and list its top three new features."
                 )
-
+                
                 # Define the prompt that will be displayed and used
                 agent_prompt_text = (
-                    "Find and list the latest Python release versions. Present the "
-                    "results in a clear, organized format showing the most recent "
-                    "Python versions available for download."
+                    "Your task is to find the latest stable Python release and its three major new features. Follow these steps:\n"
+                    "1. Use the `python_releases_scraper` tool to identify the single most recent, stable Python version number from the list of found releases.\n"
+                    "2. Once you have the version number (e.g., '3.12.4'), use the web search tool to find its three most significant or major new features. Your search query should be specific, like \"Python 3.12 major new features\".\n"
+                    "3. Present the final answer clearly, stating the latest version number and then listing the three major features in a bulleted list."
                 )
 
                 # Display the prompt in a non-interactive textbox
                 agent_prompt_display = gr.Textbox(
                     value=agent_prompt_text,
                     label="Agent Task",
-                    lines=3,
+                    lines=5,
                     interactive=False
                 )
 
                 # The button to trigger the agent
-                agent_button = gr.Button("Get Latest Releases", variant="primary")
-
-                # Output for displaying the latest releases
-                agent_output = gr.Textbox(
-                    label="Latest Python Releases",
-                    lines=8,
-                    max_lines=12,
-                    interactive=False
+                agent_button = gr.Button("Get Latest Release Info", variant="primary")
+                
+                # Output for displaying the agent's report
+                agent_output = gr.Markdown(
+                    label="Latest Release Report"
                 )
 
-                # Information box to explain what the agent does
-                gr.Markdown(
-                    "**What this agent does:**\n"
-                    "- Scrapes the official Python downloads page\n"
-                    "- Identifies the most recent Python releases\n"
-                    "- Uses web search for additional release information if needed\n"
-                    "- Returns a clean list of latest version numbers"
-                )
+                # # Information box to explain what the agent does
+                # gr.Markdown(
+                #     "**What this agent does:**\n"
+                #     "- Scrapes the official Python downloads page to find the latest version.\n"
+                #     "- Uses web search to find the three major new features for that version.\n"
+                #     "- Returns a formatted report with the findings."
+                # )
 
                 agent_button.click(
                     fn=get_python_version_info,
                     inputs=[agent_prompt_display],
                     outputs=[agent_output],
-                    api_name="get_latest_releases"
+                    api_name="get_latest_release_info"
                 )
 
     print("Gradio UI created.")
-    return user_interface
+    return interface
+
 
 if __name__ == "__main__":
     # A mock state object is created and passed for standalone testing.
-    mock_state = {"python_tutor": None}
+    mock_state = {"python_tutor": None} 
     interface = create_interface(mock_state)
     interface.launch()
