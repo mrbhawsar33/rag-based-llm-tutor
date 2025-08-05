@@ -1,8 +1,8 @@
 """Contains the logic for the RAG-based AI tutor."""
 
 import os
-import chromadb
 from typing import List
+import chromadb
 
 from llama_index.core import (
     SimpleDirectoryReader,
@@ -27,7 +27,7 @@ from app.config import (
     MAX_HISTORY
 )
 from app.utils import preprocess_text
-from app.web_scraper import scrape_and_process_urls 
+from app.web_scraper import scrape_and_process_urls
 
 class Tutor:
     """
@@ -52,7 +52,7 @@ class Tutor:
             "When the answer is in the context, provide clear, step-by-step explanations and "
             "practical examples."
         )
-        
+
         if not MISTRAL_API_KEY:
             raise ValueError("MISTRAL_API_KEY not found in environment variables.")
 
@@ -79,7 +79,7 @@ class Tutor:
             print(f"Loaded and preprocessed {len(preprocessed_pdf_docs)} PDF documents.")
         else:
             print(f"PDF directory not found at {PDF_DIR}. No local PDF docs will be loaded.")
-        
+
         # 2. Load URLs from file and scrape web content
         urls_to_scrape = []
         urls_file_path = os.path.join(URL_DIR, "urls.txt")
@@ -94,20 +94,20 @@ class Tutor:
             print(f"Found {len(urls_to_scrape)} URLs to scrape.")
         else:
             print(f"URLs file not found at {urls_file_path}. No web content will be scraped.")
-        
+
         if urls_to_scrape:
             web_docs = scrape_and_process_urls(urls_to_scrape)
             if web_docs:
                 documents.extend(web_docs)
                 print(f"Added {len(web_docs)} web document(s) to the knowledge base.")
-        
+
         print(f"Total documents loaded for knowledge base: {len(documents)}")
         return documents
 
     def _load_query_engine(self):
         """Creates or loads a vector index and returns a query engine."""
         chroma_client = chromadb.PersistentClient(path=DB_DIR)
-        
+
         # For simplicity, we will always rebuild the index if web content is included.
         # This ensures the latest web content is always used.
         print("Rebuilding vector index to ensure fresh content...")
@@ -120,7 +120,7 @@ class Tutor:
         chroma_collection = chroma_client.get_or_create_collection(COLLECTION_NAME)
         vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
         storage_context = StorageContext.from_defaults(vector_store=vector_store)
-        
+
         documents = self._load_documents()
         if not documents:
             print("No documents found to build the index. The tutor will have no knowledge.")
@@ -132,7 +132,7 @@ class Tutor:
             show_progress=True
         )
         print("New vector index created and persisted.")
-        
+
         return vector_index.as_query_engine(
             similarity_top_k=SIMILARITY_TOP_K,
             response_mode="compact"
@@ -148,7 +148,7 @@ class Tutor:
         """Formats the conversation history into a string for the LLM."""
         if not self.conversation_history:
             return ""
-        
+
         context = "\nPrevious conversation context:\n"
         for i, entry in enumerate(self.conversation_history, 1):
             context += f"Q{i}: {entry['question']}\n"
@@ -168,8 +168,11 @@ class Tutor:
             return "Please enter a question."
 
         question_lower = question.lower()
-        if not use_context and ("previous question" in question_lower or "last question" in question_lower or "what did i ask" in question_lower):
-            return "I cannot answer that because conversation history is currently turned off. Please check the 'Remember Conversation History' box if you'd like me to remember past questions."
+        if not use_context and ("previous question" in question_lower or "last question" in
+                                question_lower or "what did i ask" in question_lower):
+            return "I cannot answer that because conversation history is currently turned off. "\
+                "Please check the 'Remember Conversation History' box if you'd like me to "\
+                "remember past questions."
 
         enhanced_question = question
         if use_context:
@@ -182,5 +185,5 @@ class Tutor:
 
         if use_context:
             self.add_to_history(question, answer)
-        
+
         return answer

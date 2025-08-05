@@ -7,9 +7,9 @@ def create_tutor_response(question, use_context, tutor_instance):
     """Handles the tutor interaction logic."""
     if not tutor_instance:
         return "Tutor is not initialized. Please wait for startup to complete.", ""
-        
+
     answer = tutor_instance.ask_question(question, use_context)
-    
+
     context_info = f"Context Enabled: {use_context}\n"
     context_info += f"History Length: {len(tutor_instance.conversation_history)} items"
     return answer, context_info
@@ -26,7 +26,7 @@ def create_interface(state: dict) -> gr.Blocks:
 
     def get_tutor():
         return state.get("python_tutor")
-    
+
     with gr.Blocks(title="Python AI Assistant", theme=gr.themes.Soft()) as interface:
         gr.Markdown("# 🐍 Python AI Assistant")
         # gr.Markdown("Your all-in-one assistant for Python questions and release information.")
@@ -47,8 +47,8 @@ def create_interface(state: dict) -> gr.Blocks:
                             scale=1
                         )
                         with gr.Row():
-                           submit_btn = gr.Button("Ask Tutor", variant="primary")
-                           clear_btn = gr.Button("Clear History")
+                            submit_btn = gr.Button("Ask Tutor", variant="primary")
+                            clear_btn = gr.Button("Clear History")
 
                     with gr.Column(scale=1):
                         context_info = gr.Textbox(
@@ -69,13 +69,15 @@ def create_interface(state: dict) -> gr.Blocks:
                     max_lines=20,
                     interactive=False
                 )
-                
-                submit_btn.click(
+
+                # FIX: Disabled the 'no-member' lint error for the .click() method.
+                submit_btn.click( # pylint: disable=no-member
                     fn=lambda q, u: create_tutor_response(q, u, get_tutor()),
                     inputs=[question_input, context_toggle],
                     outputs=[answer_output, context_info]
                 )
-                clear_btn.click(
+                # FIX: Disabled the 'no-member' lint error for the .click() method.
+                clear_btn.click( # pylint: disable=no-member
                     fn=lambda: clear_tutor_context(get_tutor()),
                     outputs=[answer_output, context_info]
                 )
@@ -84,15 +86,23 @@ def create_interface(state: dict) -> gr.Blocks:
             with gr.TabItem("Latest Release & Features"):
                 gr.Markdown(
                     "### Get Latest Python Release and Major Features\n"
-                    "The agent will find the latest Python release and list its top three new features."
+                    "The agent will find the latest Python release and list its top three" \
+                        "new features."
                 )
-                
+
                 # Define the prompt that will be displayed and used
                 agent_prompt_text = (
-                    "Your task is to find the latest stable Python release and its three major new features. Follow these steps:\n"
-                    "1. Use the `python_releases_scraper` tool to identify the single most recent, stable Python version number from the list of found releases.\n"
-                    "2. Once you have the version number (e.g., '3.12.4'), use the web search tool to find its three most significant or major new features. Your search query should be specific, like \"Python 3.12 major new features\".\n"
-                    "3. Present the final answer clearly, stating the latest version number and then listing the three major features in a bulleted list."
+                    "Your task is to find the latest stable Python release and its three major "\
+                    "new features. Follow these steps:\n"
+                    "1. Use the `python_releases_scraper` tool to identify the single "\
+                    "most recent, stable Python version number from the list of found "\
+                    "releases.\n"
+                    "2. Once you have the version number (e.g., '3.12.4'), use the "\
+                    "web search tool to find its three most significant or major "\
+                    "new features. Your search query should be specific, like "\
+                    "Python 3.12 major new features\".\n"
+                    "3. Present the final answer clearly, stating the latest version number and "\
+                    "then listing the three major features in a bulleted list."
                 )
 
                 # Display the prompt in a non-interactive textbox
@@ -105,7 +115,7 @@ def create_interface(state: dict) -> gr.Blocks:
 
                 # The button to trigger the agent
                 agent_button = gr.Button("Get Latest Release Info", variant="primary")
-                
+
                 # Output for displaying the agent's report
                 agent_output = gr.Markdown(
                     label="Latest Release Report"
@@ -119,7 +129,8 @@ def create_interface(state: dict) -> gr.Blocks:
                 #     "- Returns a formatted report with the findings."
                 # )
 
-                agent_button.click(
+                # FIX: Disabled the 'no-member' lint error for the .click() method.
+                agent_button.click( # pylint: disable=no-member
                     fn=get_python_version_info,
                     inputs=[agent_prompt_display],
                     outputs=[agent_output],
@@ -129,9 +140,9 @@ def create_interface(state: dict) -> gr.Blocks:
     print("Gradio UI created.")
     return interface
 
-
 if __name__ == "__main__":
     # A mock state object is created and passed for standalone testing.
-    mock_state = {"python_tutor": None} 
-    interface = create_interface(mock_state)
-    interface.launch()
+    mock_state = {"python_tutor": None}
+    # FIX: Renamed 'interface' to 'demo_app' to avoid redefining the name from the outer scope.
+    demo_app = create_interface(mock_state)
+    demo_app.launch()

@@ -1,14 +1,15 @@
 """Defines the AI agent for fetching Python release information."""
 
 import re
+# from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 from llama_index.core.agent import ReActAgent
 from llama_index.core.tools import FunctionTool
 from llama_index.llms.mistralai import MistralAI
 from app.config import MISTRAL_API_KEY, LLM_MODEL
 # from mistralai.error import MistralAPIException, MistralConnectionException
+
 
 def get_latest_python_version_and_features() -> str:
     """
@@ -32,47 +33,46 @@ def get_latest_python_version_and_features() -> str:
         version_match = re.search(r'(\d+\.\d+\.\d+)', latest_version_tag.string)
         if not version_match:
             return "Could not extract the version number from the download button."
-        
+
         latest_version = version_match.group(1)
-        version_for_url = latest_version.replace('.', '')
-        release_page_url = f"https://www.python.org/downloads/release/python-{version_for_url}/"
-        print(f"Found latest version: {latest_version}. Navigating to release page: {release_page_url}")
+        # INLINED: The 'version_for_url' variable was removed to reduce the local variable count.
+        release_page_url = f"https://www.python.org/downloads/release/python-{latest_version.replace
+                                                                              ('.', '')}/"
+        print(f"Found latest version: {latest_version}. Navigating to release page:\n"
+              f"      {release_page_url}")
 
         # --- Step 2: Scrape the release page for content between two points ---
         response = requests.get(release_page_url, headers=headers, timeout=15)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Find the starting point: the <strong> tag with "Release Date:"
+
         start_node = soup.find('strong', string=re.compile(r'Release Date:'))
         if not start_node:
             return f"Could not find the 'Release Date' section on page: {release_page_url}"
 
-        # Find the ending point: the <a> tag with "Full Changelog"
         end_node_link = soup.find('a', string='Full Changelog')
         if not end_node_link:
             return f"Could not find the 'Full Changelog' link on page: {release_page_url}"
-        # The actual end node is likely the parent paragraph or div of the link
+
         end_node = end_node_link.find_parent('p') or end_node_link
 
-        # Collect all content between the start and end nodes
         content_parts = []
         for sibling in start_node.find_all_next():
             if sibling == end_node:
                 break
-            # We only want to capture text from specific, meaningful tags
             if sibling.name in ['p', 'h2', 'h3', 'ul', 'ol', 'li']:
                 content_parts.append(sibling.get_text(separator=' ', strip=True))
 
-        if not content_parts:
-            return f"Successfully found version {latest_version}, but could not parse content between 'Release Date' and 'Full Changelog'."
-
         # --- Step 3: Format and return the final result ---
-        release_content = "\n\n".join(content_parts)
-        return (
-            f"The latest stable Python version is **{latest_version}**.\n\n"
-            f"Here is the content from the release page:\n\n{release_content}"
-        )
+        if content_parts:
+            return (
+                f"The latest stable Python version is **{latest_version}**.\n\n"
+                f"Here is the content from the release page:\n\n"
+                f"{'\n\n'.join(content_parts)}"
+            )
+        # else:
+        return (f"Successfully found version {latest_version}, but could not parse content "
+                    f"between 'Release Date' and 'Full Changelog'.")
 
     except requests.exceptions.RequestException as e:
         return f"A network error occurred: {e}"
@@ -111,10 +111,12 @@ def get_python_version_info(prompt: str = None) -> str:
 
     # except MistralAPIException as e:
     #     print(f"Error communicating with Mistral AI API: {e}")
-    #     return "An error occurred with the Mistral AI service. Please check your API key or try again later."
+    #     return "An error occurred with the Mistral AI service. Please check your API key or
+    # try again later."
     # except MistralConnectionException as e:
     #     print(f"Network connection error to Mistral AI: {e}")
-    #     return "Could not connect to the Mistral AI service. Please check your internet connection."
+    #     return "Could not connect to the Mistral AI service. Please check your internet
+    # connection."
     except Exception as e:
         print(f"An error occurred while running the agent: {e}")
         return f"An error occurred while running the agent: {e}"

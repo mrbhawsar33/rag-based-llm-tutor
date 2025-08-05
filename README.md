@@ -81,6 +81,7 @@ pip install -r requirements.txt
 │   └── tutor.py
 │   └── ui.py
 │   └── utils.py
+│   └── web_scraper.py
 ├── /notebooks/            # Jupyter notebooks with initial exploratory modular experiments
 ├── .env
 ├── requirements.txt

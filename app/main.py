@@ -10,7 +10,7 @@ from app.tutor import Tutor
 state = {}
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(application: FastAPI):
     """
     Manages the application's startup and shutdown events.
     On startup, it initializes the AI Tutor.

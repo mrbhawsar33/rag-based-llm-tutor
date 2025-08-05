@@ -1,10 +1,10 @@
 """
 A simple web scraper to fetch and preprocess content from a list of URLs.
 """
-import re
+# import re
+from typing import List
 import requests
 from bs4 import BeautifulSoup
-from typing import List
 from llama_index.core import Document
 from app.utils import preprocess_text
 
