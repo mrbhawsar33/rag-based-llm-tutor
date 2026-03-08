@@ -3,7 +3,6 @@
 This project is a Python programming tutor and assistant built using LlamaIndex, Mistral AI, and a Gradio interface. It can answer questions about Python, leveraging a knowledge base built from web-scraped content and PDF documents.
 
 ## Features
-
 -   **RAG Pipeline**: Uses a Retrieval-Augmented Generation (RAG) pipeline to provide answers from a custom knowledge base.
 -   **Multi-Source Knowledge**: Ingests data from both web pages and PDF files.
 -   **Context-Aware**: Remembers conversation history to answer follow-up questions.
